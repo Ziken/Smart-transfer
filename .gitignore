@@ -1,1 +1,15 @@
 .idea/
+example_data.json
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django stuff:
+transfer/migrations/
+*.log
+local_settings.py
+db.sqlite3
+
+# pyenv
+.python-version
