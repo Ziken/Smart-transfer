@@ -3,7 +3,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 
 from .models import Category, Item
-from .serializers import ItemSerializer
+from .serializers import ItemSerializer, CategorySerializer
 
 
 class CategoryItemListView(APIView):
@@ -21,3 +21,16 @@ class CategoryItemListView(APIView):
 class ItemView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
+
+
+class ItemInsertView(generics.CreateAPIView):
+    serializer_class = ItemSerializer
+
+
+class CategoryView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class CategoryInsertView(generics.CreateAPIView):
+    serializer_class = CategorySerializer
