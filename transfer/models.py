@@ -1,10 +1,12 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Category(models.Model):
     id_parent = models.ForeignKey("Category", on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=150)
     created_date = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
 
     class Meta:
         verbose_name_plural = "categories"
@@ -23,4 +25,3 @@ class Item(models.Model):
 
     def __str__(self):
        return "{0} -> {1}: {2} ({3})".format(self.id_category, self.id, self.name, self.created_date)
-
