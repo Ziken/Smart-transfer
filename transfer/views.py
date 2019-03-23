@@ -12,9 +12,13 @@ from .serializers import ItemSerializer, CategorySerializer, UserSerializer
 class CategoryItemListView(APIView):
     def get(self, request, id_parent=None):
         id_user = request.user.id
-        parent_category = Category.objects.filter(id=id_parent, created_by=id_user)
-        if not parent_category and not id_parent:
-            raise exceptions.PermissionDenied()
+        parent_category = Category.objects.filter(id=id_parent)
+        if id_parent:
+            if not parent_category:
+                return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+            if not parent_category.filter(created_by=id_user):
+                raise exceptions.PermissionDenied()
 
         categories = Category.objects.filter(id_parent=id_parent, created_by=id_user)
         items = Item.objects.filter(id_category=id_parent)
