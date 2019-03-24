@@ -10,5 +10,5 @@ urlpatterns = [
     path("category/", CategoryInsertView.as_view(), name="category_insert"),
 
     path('user/', UserCreate.as_view(), name="user_create"),
-    path("login/", LoginView.as_view(), name="login"),
+    path("login/", LoginView.as_view(), name="user_login"),
 ]
