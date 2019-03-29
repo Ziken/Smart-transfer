@@ -5,11 +5,15 @@ from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from django.core import exceptions
+
 from .models import Category, Item
 from .serializers import ItemSerializer, CategorySerializer, UserSerializer
+from .permissions import CategoryUserPermission, ItemUserPermission
+from rest_framework.permissions import IsAuthenticated
 
 
 class CategoryItemListView(APIView):
+
     def get(self, request, id_parent=None):
         id_user = request.user.id
         parent_category = Category.objects.filter(id=id_parent)
@@ -30,53 +34,25 @@ class CategoryItemListView(APIView):
 
 
 class ItemView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (ItemUserPermission, )
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
-
-    def get_object(self):
-        obj = get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])
-        parent = obj.id_category
-        if parent.created_by != self.request.user:
-            raise exceptions.PermissionDenied()
-
-        self.check_object_permissions(self.request, obj)
-
-        return obj
 
 
 class ItemInsertView(generics.CreateAPIView):
     serializer_class = ItemSerializer
-
-    def post(self, request, *args, **kwargs):
-        id_parent = request.POST.get("id_category")
-        parent_category = Category.objects.filter(id=id_parent, created_by=self.request.user.id)
-        if not parent_category:
-            raise exceptions.PermissionDenied()
-
-        return super().create(request, *args, **kwargs)
-
+    permission_classes = (ItemUserPermission, )
 
 class CategoryView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsAuthenticated, CategoryUserPermission,)
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
-    def get_object(self):
-        obj = get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])
-        self.check_object_permissions(self.request, obj)
-        if obj.created_by.id != self.request.user.id:
-            raise exceptions.PermissionDenied()
-
-        return obj
-
-
 class CategoryInsertView(generics.CreateAPIView):
     serializer_class = CategorySerializer
+    permission_classes = (IsAuthenticated, CategoryUserPermission,)
 
     def post(self, request, *args, **kwargs):
-        id_parent = request.POST.get("id_parent")
-        if id_parent and not Category.objects.filter(id=id_parent, created_by=request.user.id).exists():
-            raise exceptions.PermissionDenied()
-
         p = request.POST
         new_category = CategorySerializer(data={
             "id_parent": p.get("id_parent"),
