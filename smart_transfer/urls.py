@@ -22,5 +22,6 @@ schema_view = get_swagger_view("Smart Transfer API")
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("transfer/", include("transfer.urls")),
-    path('swagger-docs/', schema_view)
+    path('docs/', schema_view),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
